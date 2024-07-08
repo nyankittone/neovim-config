@@ -1,37 +1,32 @@
---[[ Options that would normally be set via ":set optionname" while Neovim is
-     running. ]]
-for _, value in ipairs({
-  "bg=dark",
-  "breakindent",
-  "cc=100",
-  "cindent",
-  "cinoptions=1s",
-  "completeopt=menuone,noselect", -- Relates to autocomplete (particularly for LSP? Maybe?)
-  "confirm", -- Adds a confirmation text when, for example, trying to exit without saving.
-  "cursorline",
-  "cursorlineopt=number", -- TODO: consider switching this to "both" or "line" in the future.
-  "errorbells",
-  "expandtab",
-  "ignorecase",
-  "incsearch",
-  "linebreak",
-  "mouse=",
-  "nocompatible",
-  "nohlsearch",
-  "number", -- hopefully having this here will cause no issues...
-  "scrolloff=8",
-  "shiftwidth=0",
-  "showmatch",
-  "smartcase",
-  "tabstop=4",
-  "timeoutlen=300",
-  "title",
-  "titlestring=%F\\ -\\ Neovim",
-  "undofile",
-  "updatetime=250",
-  "wildmenu",
-  "wrap",
-}) do
-  vim.cmd("set " .. value)
-end
+vim.o.bg = "dark"
+vim.o.breakindent = true
+vim.o.cc = "100"
+vim.o.cindent = true
+vim.o.cinoptions = "1s"
+vim.o.completeopt = "menuone,noselect"
+vim.o.confirm = true
+vim.o.cursorline = true
+vim.o.cursorlineopt = "number"
+vim.o.errorbells = true
+vim.o.expandtab = true
+vim.o.ignorecase = true
+vim.o.incsearch = true
+vim.o.linebreak = true
+vim.o.mouse = ""
+vim.o.compatible = false
+vim.o.hlsearch = false
+vim.o.number = true
+vim.o.scrollback = 9001
+vim.o.scrolloff = 8
+vim.o.shiftwidth = 0
+vim.o.showmatch = true
+vim.o.smartcase = true
+vim.o.tabstop = 4
+vim.o.timeoutlen = 300
+vim.o.title = true
+vim.o.titlestring = "%F - Neovim"
+vim.o.undofile = true
+vim.o.updatetime = 250
+vim.o.wildmenu = true
+vim.o.wrap = true
 

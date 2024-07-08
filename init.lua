@@ -1,6 +1,4 @@
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
+-- Setting some globals here bc it's not working from a require'd lua file. haha..... why
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true -- flip this to "false" if you don't have a nerd font installed
@@ -24,10 +22,15 @@ vim.opt.rtp:prepend(lazypath)
 require "options"
 require "keybinds"
 require "autocmd"
-require "plugin-setup/main"
+require "plugin-setup"
 require "plugin-setup/treesitter"
 require "lsp"
 
-vim.cmd.colorscheme "dracula"
-vim.api.nvim_set_hl(0, "CursorLineNr", {fg = "#c294ff", bold = true})
+if require("get-term-colors") then
+  vim.cmd.colorscheme "tokyonight"
+  vim.o.termguicolors = true
+else
+  vim.cmd.colorscheme "desert"
+  vim.o.termguicolors = false
+end
 

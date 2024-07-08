@@ -1,0 +1,20 @@
+-- set terminal colors to match my terminal emulator
+vim.g.terminal_color_0 = "#000000"
+vim.g.terminal_color_1 = "#bd93f9"
+--vim.g.terminal_color_2 = "#8d79ba"
+vim.cmd [[ let g:terminal_color_2 = '#8d79ba' ]]
+vim.g.terminal_color_3 = "#50fa7b"
+vim.g.terminal_color_4 = "#ff79c6"
+vim.g.terminal_color_5 = "#ff5555"
+vim.g.terminal_color_6 = "#bfbfbf"
+vim.g.terminal_color_7 = "#effa78"
+vim.g.terminal_color_8 = "#4d4d4d"
+vim.g.terminal_color_9 = "#caa9fa"
+vim.g.terminal_color_10 = "#aa91e3"
+vim.g.terminal_color_11 = "#5af78e"
+vim.g.terminal_color_12 = "#ff92d0"
+vim.g.terminal_color_13 = "#ff6e67"
+vim.g.terminal_color_14 = "#e6e6e6"
+vim.g.terminal_color_15 = "#eaf08d"
+
+print "hello world"

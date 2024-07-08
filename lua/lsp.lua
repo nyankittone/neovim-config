@@ -4,8 +4,13 @@
 local servers = {
   clangd = {},
   gopls = {},
-  -- pyright = {},
+  pyright = {},
   rust_analyzer = {},
+  bashls = {
+    bashIde = {
+      globPattern = "*@(.sh|.inc|.bash|.zsh|.command)"
+    },
+  },
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
@@ -59,6 +64,7 @@ local on_attach = function(_, bufnr)
   end, '[W]orkspace [L]ist Folders')
 
   -- Create a command `:Format` local to the LSP buffer
+  -- Should I use that null-ls fork ot get formatting with everyhing? I think so...
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })

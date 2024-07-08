@@ -37,14 +37,14 @@ local bubbles_theme = {
 
 require('lualine').setup {
   options = {
-    theme = bubbles_theme,
-    component_separators = { left = '💞', right = '✨' },
+    theme = "palenight",
+    component_separators = { left = '💞', right = '✨'},
     section_separators = { left = '', right = '' },
   },
   sections = {
     lualine_a = { { 'mode', fmt = function(str)
-      return str:sub(1, 1) .. str:sub(2, str:len()):lower() -- Might want to make this all-lowercase???
-    end, separator = { left = ' ' }, right_padding = 2 } },
+      return str:sub(1, 1) .. str:sub(2, str:len()):lower()
+    end, separator = { left = ' '}, right_padding = 2 }},
     lualine_b = { 'filename', 'filesize', 'branch' },
     lualine_c = {
       '%=', --[[ add your center compoentnts here in place of this comment ]]

@@ -85,11 +85,24 @@ require('lazy').setup({
     end,
   },
 
-   -- Set lualine as statusline
+  {
+    "ellisonleao/gruvbox.nvim",
+    priority = 1000,
+    opts = {
+      terminal_colors = false,
+      transparent_mode = true,
+    },
+  },
+
+  -- Set lualine as statusline if the terminal supports more than 8 colors. Else, just use the
+  -- default nvim status line.
   {
     'nvim-lualine/lualine.nvim',
     config = function()
       require 'plugin-setup/lualine'
+    end,
+    enabled = function()
+      return require 'get-term-colors'
     end,
   },
 
@@ -146,6 +159,19 @@ require('lazy').setup({
   -- Might remove this plugin is I find the need to purge some plugins from my config.
   'andweeb/presence.nvim',
 
+  -- {
+  --   "jackMort/ChatGPT.nvim",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     require 'plugin-setup/ChatGPT'
+  --   end,
+  --   dependencies = {
+  --     "MunifTanjim/nui.nvim",
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-telescope/telescope.nvim",
+  --   },
+  -- },
+
   -- Some example plugins that came bundled with kickstart.
   -- require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
@@ -158,9 +184,6 @@ require('lazy').setup({
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   -- { import = 'custom.plugins' },
 }, {
-  checker = {
-    enabled = true,
-    frequency = 14400,
-  },
+  checker = {},
 })
 
