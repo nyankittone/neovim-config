@@ -101,9 +101,6 @@ require('lazy').setup({
     config = function()
       require 'plugin-setup/lualine'
     end,
-    enabled = function()
-      return require 'get-term-colors'
-    end,
   },
 
   -- "gc" to comment visual regions/lines (THIS PLUGIN IS STUPID USEFUL WTF~~
