@@ -1,6 +1,6 @@
 -- Setting some globals here bc it's not working from a require'd lua file. haha..... why
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 vim.g.have_nerd_font = true -- flip this to "false" if you don't have a nerd font installed
 
 -- [[ Install `lazy.nvim` plugin manager ]]
