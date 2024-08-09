@@ -90,15 +90,6 @@ require('lazy').setup({
     end,
   },
 
-  {
-    "ellisonleao/gruvbox.nvim",
-    priority = 1000,
-    opts = {
-      terminal_colors = false,
-      transparent_mode = true,
-    },
-  },
-
   -- Set lualine as statusline if the terminal supports more than 8 colors. Else, just use the
   -- default nvim status line.
   {
