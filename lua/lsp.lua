@@ -53,7 +53,11 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+
+  -- I might consider disabling this bind entirely; what does this do that vim.lsp.buf.hover
+  -- doesn't?
+  -- This keybind was previously <C-k> I think. Might switch it back in the future.
+  nmap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')

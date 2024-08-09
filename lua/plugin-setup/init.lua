@@ -151,6 +151,16 @@ require('lazy').setup({
   -- Plugin for adding Discord presence to the editor (Discord will show me as "playing Neovim"!)
   'andweeb/presence.nvim',
 
+  -- Really awesome plugin for previewing Markdown text :3
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function() vim.fn["mkdp#util#install"]() end,
+    config = function()
+      require 'plugin-setup/markdown-preview'
+    end,
+  }
   -- Some example plugins that came bundled with kickstart.
   -- require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
