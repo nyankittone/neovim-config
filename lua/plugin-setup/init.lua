@@ -99,7 +99,7 @@ require('lazy').setup({
     end,
   },
 
-  -- "gc" to comment visual regions/lines (THIS PLUGIN IS STUPID USEFUL WTF~~
+  -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', lazy = true, opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
@@ -149,21 +149,7 @@ require('lazy').setup({
   },
 
   -- Plugin for adding Discord presence to the editor (Discord will show me as "playing Neovim"!)
-  -- Might remove this plugin is I find the need to purge some plugins from my config.
   'andweeb/presence.nvim',
-
-  -- {
-  --   "jackMort/ChatGPT.nvim",
-  --   event = "VeryLazy",
-  --   config = function()
-  --     require 'plugin-setup/ChatGPT'
-  --   end,
-  --   dependencies = {
-  --     "MunifTanjim/nui.nvim",
-  --     "nvim-lua/plenary.nvim",
-  --     "nvim-telescope/telescope.nvim",
-  --   },
-  -- },
 
   -- Some example plugins that came bundled with kickstart.
   -- require 'kickstart.plugins.autoformat',
