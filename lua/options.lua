@@ -29,4 +29,5 @@ vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.wildmenu = true
 vim.o.wrap = true
+vim.o.timeoutlen=1000
 
