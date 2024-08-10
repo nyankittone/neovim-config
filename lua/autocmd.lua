@@ -16,7 +16,10 @@ vim.api.nvim_create_autocmd("ExitPre", {
 })
 
 vim.api.nvim_create_autocmd("TermOpen", {
-  command = "setlocal nonumber",
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.spell = false
+  end,
 })
 
 vim.api.nvim_create_autocmd("ColorScheme", {
