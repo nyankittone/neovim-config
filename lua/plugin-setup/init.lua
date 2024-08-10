@@ -90,7 +90,7 @@ require('lazy').setup({
     end,
   },
 
-  -- Set lualine as statusline if the terminal supports more than 8 colors. Else, just use the
+  -- Set lualine as status line if the terminal supports more than 8 colors. Else, just use the
   -- default nvim status line.
   {
     'nvim-lualine/lualine.nvim',
@@ -106,7 +106,22 @@ require('lazy').setup({
   {
     'nvim-telescope/telescope.nvim',
     branch = '0.1.x',
-    lazy = true,
+    -- This list of keys will need to be updated each time we add a keybind to telescope lmao
+    keys = {
+        {'<leader>sf'},
+        {'<leader>s/'},
+        {'<leader>ss'},
+        {'<leader>gf'},
+        {'<leader>sf'},
+        {'<leader>sh'},
+        {'<leader>sw'},
+        {'<leader>sg'},
+        {'<leader>sG'},
+        {'<leader>sd'},
+        {'<leader>sr'},
+        {'<leader>sm'},
+        {'<leader>sc'},
+    },
     dependencies = {
       'nvim-lua/plenary.nvim',
       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
@@ -138,8 +153,7 @@ require('lazy').setup({
   },
 
   -- Plugin for taking code screenshots
-  -- TODO: plugin doesn't do better syntax highlighting via treesitter or something. Is there a way
-  -- to fix this? Or must I use a new plugin? Also the plugin isn't very flexible with theming
+  -- TODO: Lazy-load this plugin.
   {
     'mistricky/codesnap.nvim',
     build = 'make',

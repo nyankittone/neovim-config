@@ -79,4 +79,10 @@ vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc
 vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
+vim.keymap.set('n', '<leader>sm', function()
+  require('telescope.builtin').man_pages({sections = { "ALL" }})
+end, { desc = '[S]earch [M]anpages' })
+vim.keymap.set('n', '<leader>sc', function()
+  require('telescope.builtin').colorscheme({enable_preview = true})
+end, { desc = '[S]earch [C]olorschemes' })
 
