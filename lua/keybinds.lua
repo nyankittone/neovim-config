@@ -41,6 +41,32 @@ vim.keymap.set('n', '<leader>tt', [[:tabe
 :term
 i]])
 
+local function set_indent(n)
+  return function()
+    vim.o.shiftwidth = 0
+    vim.o.tabstop = n
+
+    print("Set indentation to " .. n .. " spaces")
+  end
+end
+
+-- Keybinds for adjusting tab width and autoindent amount.
+vim.keymap.set('n', '<leader>i2', set_indent(2), {desc = 'Set indentation to 2 spaces'})
+vim.keymap.set('n', '<leader>i3', set_indent(3), {desc = 'Set indentation to 3 spaces'})
+vim.keymap.set('n', '<leader>i4', set_indent(4), {desc = 'Set indentation to 4 spaces'})
+vim.keymap.set('n', '<leader>i6', set_indent(6), {desc = 'Set indentation to 6 spaces'})
+vim.keymap.set('n', '<leader>i8', set_indent(8), {desc = 'Set indentation to 8 spaces'})
+
+vim.keymap.set('n', '<leader>it', function()
+  vim.o.expandtab = false
+  print 'Using tabs for indentation'
+end, {desc = 'Use tabs instead of spaces'})
+
+vim.keymap.set('n', '<leader>is', function()
+  vim.o.expandtab = true
+  print 'Using spaces for indentation'
+end, {desc = 'Use spaces instead of tabs'})
+
 -- Why can't it find "telescope.builtin" from here??? Strange... I might be able to work around
 -- this...
 -- print(require("telescope.builtin"))
