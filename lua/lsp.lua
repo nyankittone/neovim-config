@@ -92,8 +92,23 @@ mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
+-- HACK: Automatic header file inclusion in clangd appears to be buggy when developing in a C file.
+-- So, we have a special case for launching clangd to disable it auto-including header files.
+-- I hate this LSP.
 mason_lspconfig.setup_handlers {
   function(server_name)
+    if server_name == 'clangd' then
+      require('lspconfig').clangd.setup {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = servers[server_name],
+        filetypes = (servers[server_name] or {}).filetypes,
+        cmd = {'clangd', '--background-index', '--clang-tidy', '--log=verbose', '--header-insertion=never'},
+      }
+
+      return
+    end
+
     require('lspconfig')[server_name].setup {
       capabilities = capabilities,
       on_attach = on_attach,
