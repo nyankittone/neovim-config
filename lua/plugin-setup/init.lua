@@ -75,7 +75,7 @@ require('lazy').setup({
     priority = 1000,
     opts = {
       style = 'storm',
-      transparent = false,
+      transparent = true,
       on_colors = function(colors)
         colors.bg = "#05070a"
       end,

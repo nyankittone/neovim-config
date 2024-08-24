@@ -27,7 +27,7 @@ require "plugin-setup/treesitter"
 require "lsp"
 
 if require("get-term-colors") then
-  vim.cmd.colorscheme "tokyonight"
+  vim.cmd.colorscheme "dracula"
   vim.o.termguicolors = true
 else
   vim.cmd.colorscheme "desert"
