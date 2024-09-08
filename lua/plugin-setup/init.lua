@@ -175,7 +175,16 @@ require('lazy').setup({
     config = function()
       require 'plugin-setup/markdown-preview'
     end,
-  }
+  },
+
+  {
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
+
   -- Some example plugins that came bundled with kickstart.
   -- require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
