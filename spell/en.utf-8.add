@@ -8,6 +8,7 @@ keybind
 lmao
 stdout
 stderr
+<<<<<<< HEAD
 bleh
 struct
 bruh
@@ -17,3 +18,13 @@ backend
 FIXIT
 TODO
 lol
+=======
+Tetris
+POSIX
+Vulkan
+Blahaj
+colorscheme
+fullscreen
+Bleh
+btw
+>>>>>>> d90a266adb5dd5ff351e4e74a2598303bf077463

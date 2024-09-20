@@ -26,6 +26,7 @@ require "plugin-setup"
 require "plugin-setup/treesitter"
 require "lsp"
 
+-- TODO: Find a nicer way to have different settings for the colorscheme for each of my computers.
 if require("get-term-colors") then
   vim.cmd.colorscheme "dracula"
   vim.o.termguicolors = true
