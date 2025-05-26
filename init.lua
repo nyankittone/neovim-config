@@ -397,8 +397,8 @@ for k, v in pairs {
 
     gopls = {
         cmd = {"gopls"},
-        filetypes = {"go"},
-        root_markers = {"go.mod", "main.go"},
+        filetypes = {"go", "gomod", "gowork", "gotempl"},
+        root_markers = {"go.mod", "go.work", "main.go"},
     },
 
     bashls = {
@@ -410,9 +410,33 @@ for k, v in pairs {
         cmd = {"nil"},
         filetypes = {"nix"},
         root_markers = {"flake.nix", "flake.lock", "default.nix"},
+        settings = {
+            ["nil"] = {formatting = {command = {"nixfmt"}}},
+        },
+        single_file_support = true, -- idk if this does anything
     },
 
-    -- TODO: pet up a Python LSP properly!
+    pyright = {
+        cmd = {"pyright-langserver", "--stdio"},
+        filetypes = {"python"},
+        root_markers = {
+            "pyproject.toml",
+            "setup.py",
+            "setup.cfg",
+            "requirements.txt",
+            "Pipfile",
+            "pyrightconfig.json"
+        },
+        settings = {
+            python = {
+                analysis = {
+                    autoSearchPaths = true,
+                    diagnosticMode = "workspace",
+                    useLibraryCodeForTypes = true,
+                },
+            },
+        },
+    },
 
     ["*"] = {
         root_markers = {".git"},
@@ -421,7 +445,7 @@ for k, v in pairs {
     vim.lsp.config(k, v)
 end
 
-vim.lsp.enable({"clangd", "luals", "gopls", "bashls", "nil"})
+vim.lsp.enable {"clangd", "luals", "gopls", "bashls", "nil", "pyright"}
 
 vim.api.nvim_create_autocmd("LspAttach", {
     desc = "Hook to run on LSP attachment",
@@ -447,6 +471,45 @@ vim.api.nvim_create_autocmd("LspAttach", {
         -- if client:supports_method("textDocument/completion") then
         --     vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
         -- end
+
+        vim.api.nvim_create_autocmd('CompleteChanged', {
+            buffer = args.buf,
+            callback = function()
+                local info = vim.fn.complete_info({'selected'})
+                local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
+                if completionItem == nil then
+                    return
+                end
+
+                local resolvedItem = vim.lsp.buf_request_sync(
+                    args.buf,
+                    vim.lsp.protocol.Methods.completionItem_resolve,
+                    completionItem,
+                    500
+                )
+
+                local docs = vim.tbl_get(resolvedItem[args.data.client_id], 'result', 'documentation', 'value')
+                if docs == nil then
+                    return
+                end
+
+                local winData = vim.api.nvim__complete_set(info['selected'], {info = docs})
+                if not winData.winid or not vim.api.nvim_win_is_valid(winData.winid) then
+                    return
+                end
+
+                vim.api.nvim_win_set_config(winData.winid, {border = 'rounded'})
+                vim.treesitter.start(winData.bufnr, 'markdown')
+                vim.wo[winData.winid].conceallevel = 3
+
+                vim.api.nvim_create_autocmd({'TextChangedI'}, {
+                    buffer = args.buf,
+                    callback = function ()
+                        vim.lsp.completion.trigger()
+                    end
+                })
+            end
+        })
 
         local function nmap(keys, fn, description)
             if description then
