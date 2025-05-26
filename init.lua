@@ -254,6 +254,8 @@ require("lazy").setup {
                 "nil_ls",
             } do
                 -- TODO: Fix lua_ls integration being sliiiiightly broken.
+                -- It's been months since looking at this part of the code, and I forgot how lua_ls
+                -- is broken lmao
                 if server_name == "lua_ls" then
                     lsp["lua_ls"].setup {
                         on_init = lua_ls_init,
@@ -394,15 +396,6 @@ require("lazy").setup {
     },
 
     {
-        "numToStr/Comment.nvim",
-        keys = {
-            {mode = {"n"}, "gcc", "gbc", "gcO", "gco"},
-            {mode = {"v"}, "gc", "gb"},
-        },
-        opts = {},
-    },
-
-    {
         "catppuccin/nvim",
         name = "catppuccin",
         priority = 1000,
@@ -471,11 +464,17 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.api.nvim_create_autocmd("ColorScheme", {
     desc = "fix up a few rough edges with the colorscheme I use :3",
     callback = function()
-        if vim.g.colors_name == "catppuccin-latte" then
+        if vim.g.colors_name == "catppuccin-mocha" then
             vim.api.nvim_set_hl(0, "Normal", {})
             vim.api.nvim_set_hl(0, "NormalNC", {})
         end
     end,
+})
+
+-- Configuring diagnostics
+vim.diagnostic.config({
+    virtual_text = true,
+    -- virtual_lines = true,
 })
 
 -- Setting options
@@ -511,5 +510,5 @@ vim.o.wildmenu = true
 vim.o.wrap = true
 
 -- Setting the colorscheme
-vim.cmd.colorscheme "catppuccin-latte"
+vim.cmd.colorscheme "catppuccin-mocha"
 
