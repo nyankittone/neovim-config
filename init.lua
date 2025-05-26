@@ -195,11 +195,12 @@ require("lazy").setup {
         },
     },
 
+    -- TODO: Remove lspconfig; manage LSP configurations without any plugins.
+    -- I still want to use nvim-cmp, though.
     {
         "neovim/nvim-lspconfig",
         ft = {"c", "cpp", "java", "python", "javascript", "rust", "go", "html", "typescript", "sh", "bash", "lua", "nix"},
 
-        -- I may replace this with nvim_cmp in the future, gonna be real
         dependencies = {
             "hrsh7th/nvim-cmp",
             "hrsh7th/cmp-nvim-lsp",
@@ -208,8 +209,6 @@ require("lazy").setup {
             "saadparwaiz1/cmp_luasnip",
         },
 
-        -- TODO: Verify that, when the LSP is started, not every lsp known to man is started
-        -- at once.
         config = function()
             local lsp = require "lspconfig"
             local cmp = require "cmp"
@@ -253,9 +252,6 @@ require("lazy").setup {
                 "htmx",
                 "nil_ls",
             } do
-                -- TODO: Fix lua_ls integration being sliiiiightly broken.
-                -- It's been months since looking at this part of the code, and I forgot how lua_ls
-                -- is broken lmao
                 if server_name == "lua_ls" then
                     lsp["lua_ls"].setup {
                         on_init = lua_ls_init,
@@ -508,6 +504,7 @@ vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.wildmenu = true
 vim.o.wrap = true
+vim.o.tw = 100
 
 -- Setting the colorscheme
 vim.cmd.colorscheme "catppuccin-mocha"
