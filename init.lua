@@ -383,10 +383,16 @@ for k, v in pairs {
     luals = {
         cmd = {"lua-language-server"},
         filetypes = {"lua"},
-        root_markers = {{".luarc.json", "luarc.jsonc"}},
+        root_markers = {".luarc.json", ".luarc.jsonc"},
+        on_init = lua_ls_init,
         settings = {
-            Lua = {runtime = {version = "LuaJIT"}},
+            Lua = {
+                runtime = {version = "LuaJIT"},
+                signatureHelp = {enabled = true},
+            },
         },
+        telemetry = {enabled = false},
+        formatters = {ignoreComments = false},
     },
 
     gopls = {
