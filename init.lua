@@ -196,86 +196,6 @@ require("lazy").setup {
     },
 
     {
-        "neovim/nvim-lspconfig",
-        ft = {"c", "cpp", "java", "python", "javascript", "rust", "go", "html", "typescript", "sh", "bash", "lua", "nix"},
-
-        -- I may replace this with nvim_cmp in the future, gonna be real
-        dependencies = {
-            "hrsh7th/nvim-cmp",
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-path",
-            "L3MON4D3/LuaSnip",
-            "saadparwaiz1/cmp_luasnip",
-        },
-
-        -- TODO: Verify that, when the LSP is started, not every lsp known to man is started
-        -- at once.
-        config = function()
-            local lsp = require "lspconfig"
-            local cmp = require "cmp"
-            local snip = require "luasnip"
-
-            cmp.setup {
-                snippet = {
-                    expand = function(args)
-                        snip.lsp_expand(args.body)
-                    end,
-                },
-                completion = {
-                    completeopt = "menu,menuone,noinsert",
-                },
-                mapping = cmp.mapping.preset.insert {
-                    ['<C-n>'] = cmp.mapping.select_next_item(),
-                    ['<C-p>'] = cmp.mapping.select_prev_item(),
-                    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-                    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-                    ['<C-Space>'] = cmp.mapping.complete {},
-                },
-                sources = cmp.config.sources {
-                    {name = "nvim_lsp"},
-                    {name = "luasnip"},
-                    {name = "path"},
-                },
-            }
-
-            local capabilities = vim.lsp.protocol.make_client_capabilities()
-            capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-
-            for _, server_name in ipairs {
-                "clangd",
-                "gopls",
-                "rust_analyzer",
-                "pyright",
-                "ts_ls",
-                "jdtls",
-                "bashls",
-                "lua_ls",
-                "htmx",
-                "nil_ls",
-            } do
-                -- TODO: Fix lua_ls integration being sliiiiightly broken.
-                -- It's been months since looking at this part of the code, and I forgot how lua_ls
-                -- is broken lmao
-                if server_name == "lua_ls" then
-                    lsp["lua_ls"].setup {
-                        on_init = lua_ls_init,
-                        settings = {
-                            Lua = {}
-                        },
-                        capabilities = capabilities,
-                        on_attach = lsp_on_attach,
-                    }
-                else
-                    lsp[server_name].setup {
-                        capabilities = capabilities,
-                        on_attach = lsp_on_attach,
-                    }
-                end
-            end
-        end,
-    },
-
-    {
          "nvim-telescope/telescope.nvim",
          branch = "0.1.x",
          dependencies = {
@@ -452,6 +372,118 @@ vim.keymap.set("n", "<leader>is", function()
   print "Using spaces for indentation"
 end, {desc = "Use spaces instead of tabs"})
 
+-- Setting up LSP
+for k, v in pairs {
+    clangd = {
+        cmd = {"clangd", "--background-index"},
+        filetypes = {"c", "cpp"},
+        root_markers = {"compile_commands.json", "compile_flags.txt"},
+    },
+
+    luals = {
+        cmd = {"lua-language-server"},
+        filetypes = {"lua"},
+        root_markers = {{".luarc.json", "luarc.jsonc"}},
+        settings = {
+            Lua = {runtime = {version = "LuaJIT"}},
+        },
+    },
+
+    gopls = {
+        cmd = {"gopls"},
+        filetypes = {"go"},
+        root_markers = {"go.mod", "main.go"},
+    },
+
+    bashls = {
+        cmd = {"bash-language-server", "start"},
+        filetypes = {"sh", "bash", "zsh"},
+    },
+
+    ["nil"] = {
+        cmd = {"nil"},
+        filetypes = {"nix"},
+        root_markers = {"flake.nix", "flake.lock", "default.nix"},
+    },
+
+    -- TODO: pet up a Python LSP properly!
+
+    ["*"] = {
+        root_markers = {".git"},
+    },
+} do
+    vim.lsp.config(k, v)
+end
+
+vim.lsp.enable({"clangd", "luals", "gopls", "bashls", "nil"})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+    desc = "Hook to run on LSP attachment",
+    group = vim.api.nvim_create_augroup("my.lsp", {}),
+    callback = function(args)
+        local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+        if client:supports_method("textDocument/implementation") then
+            -- create keymap for vim.lsp.buf.implementation...
+        end
+
+        if client:supports_method("textDocument/completion") then
+            local chars = {}
+            for i = 32, 126 do
+                table.insert(chars, string.char(i))
+            end
+
+            client.server_capabilities.completionProvider.triggerCharacters = chars
+
+            vim.lsp.completion.enable(true, client.id, args.buf, {autotrigger = true})
+        end
+
+        -- local client = vim.lsp.get_client_by_id(ev.data.client_data)
+        -- if client:supports_method("textDocument/completion") then
+        --     vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+        -- end
+
+        local function nmap(keys, fn, description)
+            if description then
+                description = "LSP:" .. description
+            end
+
+            vim.keymap.set("n", keys, fn, {buffer = args.buf, desc = description})
+        end
+
+        nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+        nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+
+        nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+        nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+        nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+        nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+        nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+        nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+
+        -- I might consider disabling this bind entirely; what does this do that vim.lsp.buf.hover
+        -- doesn't?
+        -- This keybind was previously <C-k> I think. Might switch it back in the future.
+        nmap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
+
+        -- Lesser used LSP functionality
+        nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+        nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
+        nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
+        nmap('<leader>wl', function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, '[W]orkspace [L]ist Folders')
+
+        vim.api.nvim_buf_create_user_command(args.buf, 'Format', function(_)
+            vim.lsp.buf.format({bufnr = args.buf, id = client.id, timeout_ms = 1000})
+        end, { desc = 'Format current buffer with LSP' })
+    end,
+})
+
+vim.diagnostic.config({
+    virtual_text = true,
+    -- virtual_lines = true,
+})
+
 -- Setting up autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
     callback = function()
@@ -469,12 +501,6 @@ vim.api.nvim_create_autocmd("ColorScheme", {
             vim.api.nvim_set_hl(0, "NormalNC", {})
         end
     end,
-})
-
--- Configuring diagnostics
-vim.diagnostic.config({
-    virtual_text = true,
-    -- virtual_lines = true,
 })
 
 -- Setting options
