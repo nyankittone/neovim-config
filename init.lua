@@ -195,6 +195,8 @@ require("lazy").setup {
         },
     },
 
+    -- TODO: Remove lspconfig; manage LSP configurations without any plugins.
+    -- I still want to use nvim-cmp, though.
     {
          "nvim-telescope/telescope.nvim",
          branch = "0.1.x",
@@ -603,6 +605,7 @@ vim.o.undofile = true
 vim.o.updatetime = 250
 vim.o.wildmenu = true
 vim.o.wrap = true
+vim.o.tw = 100
 
 -- Setting the colorscheme
 vim.cmd.colorscheme "catppuccin-mocha"
