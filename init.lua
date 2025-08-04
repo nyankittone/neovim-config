@@ -175,15 +175,21 @@ require("lazy").setup {
             harpoon:extend(extensions.builtins.highlight_current_file())
 
             local hmap = map("Harpoon")
-            local list = harpoon:list()
+            local main_list = harpoon:list()
 
-            hmap("<leader>a", function() list:add() end, "Add current buffer to list")
-            hmap("<leader>h", function() harpoon.ui:toggle_quick_menu(list) end, "Show buffer list")
-            hmap("<leader>,", function() list:prev() end, "Switch to previous buffer")
-            hmap("<leader>,", function() list:next() end, "Switch to next buffer")
+            local function select_buffer(n)
+                return function()
+                    main_list:select(n)
+                end
+            end
+
+            hmap("<leader>a", function() main_list:add() end, "Add current buffer to list")
+            hmap("<leader>h", function() harpoon.ui:toggle_quick_menu(main_list) end, "Show buffer list")
+            hmap("<leader>,", function() main_list:prev() end, "Switch to previous buffer")
+            hmap("<leader>,", function() main_list:next() end, "Switch to next buffer")
 
             for i = 1,10 do
-                hmap("<leader>" .. i % 10, function() list:select(i) end, "Switch to buffer " .. i)
+                hmap("<leader>" .. i % 10, select_buffer(i), "Switch to buffer " .. i)
             end
         end,
     },
