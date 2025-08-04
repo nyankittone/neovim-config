@@ -95,6 +95,17 @@ local function lua_ls_init(client)
     })
 end
 
+local function map(prefix)
+    return function(keys, fn, description)
+        if description then
+            description = prefix .. ": " .. description
+        end
+
+        vim.keymap.set("n", keys, fn, {desc = description})
+    end
+end
+
+
 -- Configuring plugins
 require("lazy").setup {
     {
@@ -151,6 +162,30 @@ require("lazy").setup {
             { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
             { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
         },
+    },
+
+    {
+        "ThePrimeagen/harpoon",
+        branch = "harpoon2",
+        dependencies = {"nvim-lua/plenary.nvim"},
+        config = function()
+            local harpoon = require "harpoon"
+            local extensions = require "harpoon.extensions"
+            harpoon:setup()
+            harpoon:extend(extensions.builtins.highlight_current_file())
+
+            local hmap = map("Harpoon")
+            local list = harpoon:list()
+
+            hmap("<leader>a", function() list:add() end, "Add current buffer to list")
+            hmap("<leader>h", function() harpoon.ui:toggle_quick_menu(list) end, "Show buffer list")
+            hmap("<leader>,", function() list:prev() end, "Switch to previous buffer")
+            hmap("<leader>,", function() list:next() end, "Switch to next buffer")
+
+            for i = 1,10 do
+                hmap("<leader>" .. i % 10, function() list:select(i) end, "Switch to buffer " .. i)
+            end
+        end,
     },
 
     -- TODO: I'm not sure if the treesitter stuff here is working 100% as it should.
@@ -335,36 +370,29 @@ require("lazy").setup {
 
             require("telescope").load_extension("undo")
 
-             local function map(keys, fn, description)
-                 if description then
-                     description = "Telescope: " .. description
-                 end
-
-                 vim.keymap.set("n", keys, fn, {desc = description})
-             end
-
              local telescope = require "telescope.builtin"
+             local tmap = map("Telescope")
 
              -- Telescope-specific keybinds
-             map("<leader>ff", telescope.find_files, "[F]ind [F]iles")
-             map("<leader>fr", telescope.live_grep, "[F]ind with [R]egex")
-             map("<leader><space>", telescope.buffers, "Find Buffers")
-             map("<leader>fh", telescope.help_tags, "[F]ind [H]elp")
+             tmap("<leader>ff", telescope.find_files, "[F]ind [F]iles")
+             tmap("<leader>fr", telescope.live_grep, "[F]ind with [R]egex")
+             tmap("<leader><space>", telescope.buffers, "Find Buffers")
+             tmap("<leader>fh", telescope.help_tags, "[F]ind [H]elp")
 
              -- Will probably remove one of these... I must experiment
-             map("<leader>fc", telescope.commands, "[F]ind [C]ommands")
-             map("<leader>fC", telescope.command_history, "[F]ind [C]command history")
+             tmap("<leader>fc", telescope.commands, "[F]ind [C]ommands")
+             tmap("<leader>fC", telescope.command_history, "[F]ind [C]command history")
 
              -- TODO: might remove; do I really want to look at manpages through vim?
-             map("<leader>fm", telescope.man_pages, "[F]ind [M]anpage")
-             map("<leader>fi", telescope.current_buffer_fuzzy_find, "[F]ind [I]nside current buffer")
-             map("<leader>fd", telescope.diagnostics, "[F]ind [D]iagnostics")
+             tmap("<leader>fm", telescope.man_pages, "[F]ind [M]anpage")
+             tmap("<leader>fi", telescope.current_buffer_fuzzy_find, "[F]ind [I]nside current buffer")
+             tmap("<leader>fd", telescope.diagnostics, "[F]ind [D]iagnostics")
 
              -- Git-related keybinds
-             map("<leader>gf", telescope.git_files, "Show [G]it [F]iles")
-             map("<leader>gc", telescope.git_commits, "[G]it [C]ommits")
-             map("<leader>gb", telescope.git_branches, "[G]it [B]ranches")
-             map("<leader>gs", telescope.git_status, "[G]it [S]tatus")
+             tmap("<leader>gf", telescope.git_files, "Show [G]it [F]iles")
+             tmap("<leader>gc", telescope.git_commits, "[G]it [C]ommits")
+             tmap("<leader>gb", telescope.git_branches, "[G]it [B]ranches")
+             tmap("<leader>gs", telescope.git_status, "[G]it [S]tatus")
 
              -- TODO: Investigate switching some of the keybinds within the Telescope window.
              -- Namely, the binds for moving up and down from insert mode.
