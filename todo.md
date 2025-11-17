@@ -1,5 +1,5 @@
 # Todo list meow
-- [ ] remove harpoon
+- [X] remove harpoon
 - [ ] add a file manager? either yazi.nvim or oil.nvim
 - [ ] Make the terminal emulator nicer to use
     - [ ] Quick navigation (no need to enter directly into terminal mode and back
