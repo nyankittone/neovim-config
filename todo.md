@@ -7,7 +7,8 @@
     - [ ] Make spawning terminal windows quick with keybinds
         * <leader>S -> spawn a terminal vertically
         * <leader>V -> spawn a terminal horizontally
+        * <leader>(v|s)<some key> -> spawn general window types either vertically or horizontally
 - [ ] Plugin for managing Git
 - [ ] Make the stats bar color really bright on the focused window
 - [ ] Experiment with removing nvim-lspconfig
-- [ ] Create a neovim plugin!!! (either tetris or minesweeper)
+- [ ] Create a neovim plugin!!! (either guideline tetris or minesweeper)
