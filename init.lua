@@ -150,23 +150,23 @@ require("lazy").setup {
         },
     },
 
-    {
-        "christoomey/vim-tmux-navigator",
-        cmd = {
-            "TmuxNavigateLeft",
-            "TmuxNavigateDown",
-            "TmuxNavigateUp",
-            "TmuxNavigateRight",
-            "TmuxNavigatePrevious",
-        },
-        keys = {
-            { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
-            { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
-            { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
-            { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
-            { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
-        },
-    },
+    -- {
+    --     "christoomey/vim-tmux-navigator",
+    --     cmd = {
+    --         "TmuxNavigateLeft",
+    --         "TmuxNavigateDown",
+    --         "TmuxNavigateUp",
+    --         "TmuxNavigateRight",
+    --         "TmuxNavigatePrevious",
+    --     },
+    --     keys = {
+    --         { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
+    --         { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
+    --         { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
+    --         { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
+    --         { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    --     },
+    -- },
 
     -- TODO: I'm not sure if the treesitter stuff here is working 100% as it should.
     {
@@ -383,8 +383,8 @@ require("lazy").setup {
          end,
     },
 
-    -- TODO: Look for an alternative to this that hooks into telescope... also look into using
-    -- telescope and treesitter like wayyyyy more girlie
+    -- TODO: COnfigure Neotree more in-depth. Also see if it meshes nicely with Oil.nvim, and if
+    -- not, if I should remove this plugin.
     {
         "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",
@@ -401,6 +401,36 @@ require("lazy").setup {
                 enable_diagnostics = true,
             },
         },
+    },
+
+    {
+        "stevearc/oil.nvim",
+        dependencies = {
+            {
+                "nvim-mini/mini.icons",
+                opts = {
+                    default_file_explorer = true,
+                    columns = {
+                        "icon",
+                        "permissions",
+                        "size",
+                    },
+                    buf_options = {
+                        buflisted = true,
+                    },
+                    delete_to_trash = true,
+                    skip_confirm_for_simple_edits = true,
+                    cleanup_delay_ms = 10000,
+                    constrain_cursor = "editable",
+                    watch_for_changes = true,
+                    show_hidden = true,
+                    natural_order = false,
+                    case_insensitive = true,
+                },
+            },
+        },
+        opts = {},
+        lazy = false,
     },
 
     {
@@ -467,6 +497,51 @@ vim.keymap.set("n", "<leader>is", function()
   print "Using spaces for indentation"
 end, {desc = "Use spaces instead of tabs"})
 
+-- May remove this at some point
+vim.keymap.set("n", "<leader>o", "<CMD>Oil<CR>", {desc = "Open file manager in parent directory"})
+
+vim.keymap.set("n", "<C-h>", "<C-w>h")
+vim.keymap.set("n", "<C-j>", "<C-w>j")
+vim.keymap.set("n", "<C-k>", "<C-w>k")
+vim.keymap.set("n", "<C-l>", "<C-w>l")
+vim.keymap.set("t", "<C-h>", "<C-\\><C-n><C-w>h")
+vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
+vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
+vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
+
+vim.keymap.set("t", "<C-v>", "<C-\\><C-n>")
+
+local function spawn_horiz(command)
+    return function()
+        vim.cmd ([[
+            split
+            wincmd j
+        ]] .. command)
+    end
+end
+
+local function spawn_vert(command)
+    return function()
+        vim.cmd ([[
+            vsplit
+            wincmd l
+        ]] .. command)
+    end
+end
+
+local function launch_on_split(keys, command)
+    vim.keymap.set("n", "<C-space>s" .. keys, spawn_horiz(command))
+    vim.keymap.set("n", "<C-space>v" .. keys, spawn_vert(command))
+    vim.keymap.set("t", "<C-space>s" .. keys, spawn_horiz(command))
+    vim.keymap.set("t", "<C-space>v" .. keys, spawn_vert(command))
+end
+
+vim.keymap.set("n", "<C-space><C-s>", spawn_horiz("term"))
+vim.keymap.set("n", "<C-space><C-v>", spawn_vert("term"))
+vim.keymap.set("t", "<C-space><C-s>", spawn_horiz("term"))
+vim.keymap.set("t", "<C-space><C-v>", spawn_vert("term"))
+launch_on_split("t", "term")
+
 -- Setting up autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
     callback = function()
@@ -474,6 +549,45 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     end,
     group = vim.api.nvim_create_augroup("YankHighlight", { clear = true }),
     pattern = "*",
+})
+
+vim.api.nvim_create_autocmd("WinEnter", {
+    desc = "Automatically enter terminal mode when switching to a terminal window",
+    callback = function()
+        local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
+
+        -- Check first part of string to see if it matches "term:". If yes, enter terminal mode.
+        if (string.find(name, "term:", 1, true) == 1) then
+            vim.api.nvim_input("i") -- Goofy-aah way of entering terminal mode
+        end
+    end,
+})
+
+vim.api.nvim_create_autocmd("TermOpen", {
+    desc = "Terminal emulator configuration",
+    callback = function()
+        vim.wo.spell = false
+        vim.api.nvim_input("i") -- This might need to be removed later.
+    end,
+})
+
+vim.api.nvim_create_autocmd("TermRequest", {
+  desc = 'Handles OSC 7 dir change requests',
+  callback = function(ev)
+    local val, n = string.gsub(ev.data.sequence, '\027]7;file://[^/]*', '')
+    if n > 0 then
+      -- OSC 7: dir-change
+      local dir = val
+      if vim.fn.isdirectory(dir) == 0 then
+        vim.notify('invalid dir: '..dir)
+        return
+      end
+      vim.b[ev.buf].osc7_dir = dir
+      if vim.api.nvim_get_current_buf() == ev.buf then
+        vim.cmd.lcd(dir)
+      end
+    end
+  end
 })
 
 vim.api.nvim_create_autocmd("ColorScheme", {
