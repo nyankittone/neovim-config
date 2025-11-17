@@ -8,7 +8,9 @@
         * <leader>S -> spawn a terminal vertically
         * <leader>V -> spawn a terminal horizontally
         * <leader>(v|s)<some key> -> spawn general window types either vertically or horizontally
+    - [ ] Make stuff aware of the local working directory of the shell inside a terminal emulator
 - [ ] Plugin for managing Git
 - [ ] Make the stats bar color really bright on the focused window
 - [ ] Experiment with removing nvim-lspconfig
 - [ ] Create a neovim plugin!!! (either guideline tetris or minesweeper)
+- [ ] Experiment with tiling windows???

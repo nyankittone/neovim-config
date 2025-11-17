@@ -269,7 +269,6 @@ require("lazy").setup {
         },
 
         config = function()
-            local lsp = require "lspconfig"
             local cmp = require "cmp"
             local snip = require "luasnip"
 
@@ -313,20 +312,24 @@ require("lazy").setup {
                 "qmlls",
             } do
                 if server_name == "lua_ls" then
-                    lsp["lua_ls"].setup {
+                    vim.lsp.config["lua_ls"] = {
                         on_init = lua_ls_init,
                         settings = {
                             Lua = {}
                         },
                         capabilities = capabilities,
                         on_attach = lsp_on_attach,
+                        unpack(vim.lsp.config.lua_ls)
                     }
                 else
-                    lsp[server_name].setup {
+                    vim.lsp.config[server_name] = {
                         capabilities = capabilities,
                         on_attach = lsp_on_attach,
+                        unpack(vim.lsp.config[server_name])
                     }
                 end
+
+                vim.lsp.enable(server_name)
             end
         end,
     },
