@@ -121,6 +121,10 @@ require("lazy").setup {
     },
 
     {
+        "vimwiki/vimwiki",
+    },
+
+    {
         "iamcco/markdown-preview.nvim",
         cmd = {"MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop"},
         ft = { "markdown" },
@@ -306,6 +310,7 @@ require("lazy").setup {
                 "lua_ls",
                 "htmx",
                 "nil_ls",
+                "qmlls",
             } do
                 if server_name == "lua_ls" then
                     lsp["lua_ls"].setup {
@@ -450,6 +455,13 @@ require("lazy").setup {
             },
         },
     },
+
+    {
+        "ellisonleao/gruvbox.nvim",
+        priority = 1000,
+        config = true,
+        opts = {},
+    },
 }
 
 -- Setting up keybinds
@@ -508,10 +520,8 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.api.nvim_create_autocmd("ColorScheme", {
     desc = "fix up a few rough edges with the colorscheme I use :3",
     callback = function()
-        if vim.g.colors_name == "catppuccin-mocha" then
             vim.api.nvim_set_hl(0, "Normal", {})
             vim.api.nvim_set_hl(0, "NormalNC", {})
-        end
     end,
 })
 
@@ -555,5 +565,5 @@ vim.o.wrap = true
 vim.o.tw = 100
 
 -- Setting the colorscheme
-vim.cmd.colorscheme "catppuccin-mocha"
+vim.cmd.colorscheme "gruvbox"
 
