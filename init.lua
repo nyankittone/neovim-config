@@ -124,6 +124,8 @@ require("lazy").setup {
         "vimwiki/vimwiki",
     },
 
+    "tpope/vim-fugitive",
+
     {
         "iamcco/markdown-preview.nvim",
         cmd = {"MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop"},
@@ -481,11 +483,9 @@ local function set_indent(n)
     end
 end
 
-vim.keymap.set("n", "<leader>i2", set_indent(2), {desc = "Set indentation to 2 spaces"})
-vim.keymap.set("n", "<leader>i3", set_indent(3), {desc = "Set indentation to 3 spaces"})
-vim.keymap.set("n", "<leader>i4", set_indent(4), {desc = "Set indentation to 4 spaces"})
-vim.keymap.set("n", "<leader>i6", set_indent(6), {desc = "Set indentation to 6 spaces"})
-vim.keymap.set("n", "<leader>i8", set_indent(8), {desc = "Set indentation to 8 spaces"})
+for i = 1,9 do
+    vim.keymap.set("n", "<leader>i" .. i, set_indent(i), {desc = "Set indentation to " .. i .. " spaces"})
+end
 
 vim.keymap.set("n", "<leader>it", function()
   vim.o.expandtab = false
@@ -509,7 +509,7 @@ vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
 vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
 vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
 
-vim.keymap.set("t", "<C-v>", "<C-\\><C-n>")
+vim.keymap.set("t", "<C-space>", "<C-\\><C-n>")
 
 local function spawn_horiz(command)
     return function()
@@ -529,18 +529,22 @@ local function spawn_vert(command)
     end
 end
 
-local function launch_on_split(keys, command)
-    vim.keymap.set("n", "<C-space>s" .. keys, spawn_horiz(command))
-    vim.keymap.set("n", "<C-space>v" .. keys, spawn_vert(command))
-    vim.keymap.set("t", "<C-space>s" .. keys, spawn_horiz(command))
-    vim.keymap.set("t", "<C-space>v" .. keys, spawn_vert(command))
+local function spawn_in_place(command)
+    return function()
+        vim.cmd(command)
+    end
 end
 
-vim.keymap.set("n", "<C-space><C-s>", spawn_horiz("term"))
-vim.keymap.set("n", "<C-space><C-v>", spawn_vert("term"))
-vim.keymap.set("t", "<C-space><C-s>", spawn_horiz("term"))
-vim.keymap.set("t", "<C-space><C-v>", spawn_vert("term"))
-launch_on_split("t", "term")
+local function generate_launch(keys, command)
+    vim.keymap.set("n", "<leader>s" .. keys, spawn_horiz(command))
+    vim.keymap.set("n", "<leader>v" .. keys, spawn_vert(command))
+    vim.keymap.set("n", "<leader>r" .. keys, spawn_in_place(command))
+end
+
+vim.keymap.set("n", "<leader>S", spawn_horiz("term"))
+vim.keymap.set("n", "<leader>V", spawn_vert("term"))
+vim.keymap.set("n", "<leader>R", spawn_in_place("term"))
+generate_launch("t", "term")
 
 -- Setting up autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -551,23 +555,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     pattern = "*",
 })
 
-vim.api.nvim_create_autocmd("WinEnter", {
-    desc = "Automatically enter terminal mode when switching to a terminal window",
-    callback = function()
-        local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
-
-        -- Check first part of string to see if it matches "term:". If yes, enter terminal mode.
-        if (string.find(name, "term:", 1, true) == 1) then
-            vim.api.nvim_input("i") -- Goofy-aah way of entering terminal mode
-        end
-    end,
-})
-
 vim.api.nvim_create_autocmd("TermOpen", {
     desc = "Terminal emulator configuration",
     callback = function()
         vim.wo.spell = false
-        vim.api.nvim_input("i") -- This might need to be removed later.
     end,
 })
 
