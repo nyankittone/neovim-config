@@ -584,6 +584,15 @@ vim.api.nvim_create_autocmd("TermOpen", {
     end,
 })
 
+vim.api.nvim_create_autocmd("WinEnter", {
+    desc = "Automatically enter terminal mode when switching to a terminal window",
+    callback = function()
+        if vim.bo.buftype == "terminal" then
+            vim.api.nvim_input("i") -- Goofy-aah way of entering terminal mode
+        end
+    end,
+})
+
 vim.api.nvim_create_autocmd("TermRequest", {
   desc = 'Handles OSC 7 dir change requests',
   callback = function(ev)
