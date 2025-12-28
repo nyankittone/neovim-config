@@ -585,6 +585,8 @@ generate_launch("t", spawn_term)
 umap(":", function()
     vim.cmd.stopinsert()
     vim.api.nvim_input(":")
+
+    -- TODO: add thing that will block until we're not in command mode, then nvim_input("i")
 end)
 
 -- I may instead this return and do nothing else if the requested tab doesn't exist, and then have a
