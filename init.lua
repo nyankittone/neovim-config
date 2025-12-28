@@ -122,6 +122,10 @@ require("lazy").setup {
 
     {
         "vimwiki/vimwiki",
+        ft = {
+            "markdown",
+            "wiki",
+        },
     },
 
     "tpope/vim-fugitive",
@@ -151,24 +155,6 @@ require("lazy").setup {
             },
         },
     },
-
-    -- {
-    --     "christoomey/vim-tmux-navigator",
-    --     cmd = {
-    --         "TmuxNavigateLeft",
-    --         "TmuxNavigateDown",
-    --         "TmuxNavigateUp",
-    --         "TmuxNavigateRight",
-    --         "TmuxNavigatePrevious",
-    --     },
-    --     keys = {
-    --         { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
-    --         { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
-    --         { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
-    --         { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
-    --         { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
-    --     },
-    -- },
 
     -- TODO: I'm not sure if the treesitter stuff here is working 100% as it should.
     {
@@ -244,7 +230,7 @@ require("lazy").setup {
                     ['<C-p>'] = cmp.mapping.select_prev_item(),
                     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
                     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-                    ['<C-Space>'] = cmp.mapping.complete {},
+                    ['<C-v>'] = cmp.mapping.complete {},
                 },
                 sources = cmp.config.sources {
                     {name = "nvim_lsp"},
@@ -392,6 +378,7 @@ require("lazy").setup {
         branch = "v3.x",
         keys = {
             {"<leader>p", "<cmd>Neotree toggle float<cr>"},
+            {"<leader>G", "<cmd>Neotree toggle float git_status<cr>"},
         },
         dependencies = {
             "nvim-lua/plenary.nvim",
@@ -401,6 +388,24 @@ require("lazy").setup {
                 close_if_last_window = true,
                 enable_git_status = false,
                 enable_diagnostics = true,
+                sort_case_insensitive = true,
+
+                default_component_configs = {
+                    git_status = {
+                        symbols = {
+                            added = "+",
+                            modified = "~",
+                            deleted = "-",
+                        },
+                    },
+                },
+
+                filesystem = {
+                    filtered_items = {
+                        hide_dotfiles = false,
+                        hide_gitignored = false,
+                    },
+                },
             },
         },
     },
@@ -510,6 +515,7 @@ vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
 vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
 
 vim.keymap.set("t", "<C-space>", "<C-\\><C-n>")
+vim.keymap.set("i", "<C-space>", "<ESC>")
 
 local function spawn_horiz(command)
     return function()
@@ -545,6 +551,22 @@ vim.keymap.set("n", "<leader>S", spawn_horiz("term"))
 vim.keymap.set("n", "<leader>V", spawn_vert("term"))
 vim.keymap.set("n", "<leader>R", spawn_in_place("term"))
 generate_launch("t", "term")
+
+-- I need to redo parts of how I use neovim terminals.
+-- Make it so that there's some binds that I can always access from any mode, including terminal
+-- mode. This would be triggered with something like Ctrl-Space. In this mode will contain:
+-- * Bind for spawning a new terminal to the left, down, "replacing" a buffer, or floating
+-- * Bind for doing the same but with opening a file. File can be opened with either telescope or
+--   neotree
+-- * Same thing but with manpages
+-- * actually maybe it'd be cool if I could use this for any binds where I want to make a new window
+-- Binds like this should follow a consistent pattern for pressing.
+--   * Something like <C-Space><C-R> for replacing the window with a terminal...
+--   * ... but something like <C-Space>rf can replace the buffer with files.
+--   * Ideally, having the telescope/neotree window appear where the new buffer will be is ideal.
+-- Binds for switching tabs really fast, and one for moving windows around would also be really cool. 
+-- We should also like 100000% fix the issue where the neovim terminal freezes when it's doing too
+-- much...
 
 -- Setting up autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
