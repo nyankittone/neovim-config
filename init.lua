@@ -514,9 +514,6 @@ vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
 vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
 vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
 
-vim.keymap.set("t", "<C-space>", "<C-\\><C-n>")
-vim.keymap.set("i", "<C-space>", "<ESC>")
-
 local function spawn_horiz(command)
     return function()
         vim.cmd ([[
@@ -541,21 +538,31 @@ local function spawn_in_place(command)
     end
 end
 
-local function generate_launch(keys, command)
-    vim.keymap.set("n", "<leader>s" .. keys, spawn_horiz(command))
-    vim.keymap.set("n", "<leader>v" .. keys, spawn_vert(command))
-    vim.keymap.set("n", "<leader>r" .. keys, spawn_in_place(command))
+local function umap(keys, command)
+    for _, mode in ipairs {"n", "i", "t", "v", "s"} do
+        vim.keymap.set(mode, "<C-Space>" .. keys, command)
+    end
 end
 
-vim.keymap.set("n", "<leader>S", spawn_horiz("term"))
-vim.keymap.set("n", "<leader>V", spawn_vert("term"))
-vim.keymap.set("n", "<leader>R", spawn_in_place("term"))
+local function generate_launch(keys, command)
+    umap("s" .. keys, spawn_horiz(command))
+    umap("v" .. keys, spawn_vert(command))
+    umap("r" .. keys, spawn_in_place(command))
+end
+
+umap("<C-s>", spawn_horiz("term"))
+umap("<C-v>", spawn_vert("term"))
+umap("<C-r>", spawn_in_place("term"))
 generate_launch("t", "term")
+
+umap(":", function()
+    vim.cmd.stopinsert()
+    vim.api.nvim_input(":")
+end)
 
 -- I need to redo parts of how I use neovim terminals.
 -- Make it so that there's some binds that I can always access from any mode, including terminal
 -- mode. This would be triggered with something like Ctrl-Space. In this mode will contain:
--- * Bind for spawning a new terminal to the left, down, "replacing" a buffer, or floating
 -- * Bind for doing the same but with opening a file. File can be opened with either telescope or
 --   neotree
 -- * Same thing but with manpages
