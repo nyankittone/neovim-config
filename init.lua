@@ -514,12 +514,28 @@ vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
 vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
 vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
 
+local function command_or_func(thing)
+    if type(thing) == "string" then
+        vim.cmd(thing)
+    end
+    if type(thing) == "function" then
+        thing()
+    end
+end
+
+local function spawn_term()
+    vim.cmd.terminal()
+    vim.api.nvim_input("i")
+end
+
 local function spawn_horiz(command)
     return function()
         vim.cmd ([[
             split
             wincmd j
-        ]] .. command)
+        ]])
+
+        command_or_func(command)
     end
 end
 
@@ -528,13 +544,22 @@ local function spawn_vert(command)
         vim.cmd ([[
             vsplit
             wincmd l
-        ]] .. command)
+        ]])
+
+        command_or_func(command)
     end
 end
 
 local function spawn_in_place(command)
     return function()
-        vim.cmd(command)
+        command_or_func(command)
+    end
+end
+
+local function spawn_tab(command)
+    return function()
+        vim.cmd.tabnew()
+        command_or_func(command)
     end
 end
 
@@ -548,17 +573,33 @@ local function generate_launch(keys, command)
     umap("s" .. keys, spawn_horiz(command))
     umap("v" .. keys, spawn_vert(command))
     umap("r" .. keys, spawn_in_place(command))
+    umap("t" .. keys, spawn_in_place(command))
 end
 
-umap("<C-s>", spawn_horiz("term"))
-umap("<C-v>", spawn_vert("term"))
-umap("<C-r>", spawn_in_place("term"))
-generate_launch("t", "term")
+umap("<C-s>", spawn_horiz(spawn_term))
+umap("<C-v>", spawn_vert(spawn_term))
+umap("<C-r>", spawn_in_place(spawn_term))
+umap("<C-t>", spawn_tab(spawn_term))
+generate_launch("t", spawn_term)
 
 umap(":", function()
     vim.cmd.stopinsert()
     vim.api.nvim_input(":")
 end)
+
+-- I may instead this return and do nothing else if the requested tab doesn't exist, and then have a
+-- different key sequence for making new tabs.
+for i = 1,10 do
+    umap(i % 10, function()
+        if i > #(vim.api.nvim_list_tabpages()) then
+            vim.cmd.tabnew()
+            vim.cmd.terminal()
+            vim.api.nvim_input("i") -- Dirty hack to make entering insert mode automatically work
+        else
+            vim.api.nvim_set_current_tabpage(i)
+        end
+    end)
+end
 
 -- I need to redo parts of how I use neovim terminals.
 -- Make it so that there's some binds that I can always access from any mode, including terminal
