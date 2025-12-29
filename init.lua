@@ -323,6 +323,9 @@ require("lazy").setup {
                      find_files = {
                          find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*"},
                      },
+                     man_pages = {
+                         sections = { "ALL" },
+                     },
                  },
                  extensions = {
                      undo = {
@@ -377,8 +380,8 @@ require("lazy").setup {
         "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",
         keys = {
-            {"<leader>p", "<cmd>Neotree toggle float<cr>"},
-            {"<leader>G", "<cmd>Neotree toggle float git_status<cr>"},
+            {"<leader>p", "<cmd>Neotree toggle float .<cr>"},
+            {"<leader>G", "<cmd>Neotree toggle float git_status .<cr>"},
         },
         dependencies = {
             "nvim-lua/plenary.nvim",
@@ -593,19 +596,12 @@ end)
 -- different key sequence for making new tabs.
 for i = 1,10 do
     umap(i % 10, function()
-        if i > #(vim.api.nvim_list_tabpages()) then
-            vim.cmd.tabnew()
-            vim.cmd.terminal()
-            vim.api.nvim_input("i") -- Dirty hack to make entering insert mode automatically work
-        else
+        if i <= #(vim.api.nvim_list_tabpages()) then
             vim.api.nvim_set_current_tabpage(i)
         end
     end)
 end
 
--- I need to redo parts of how I use neovim terminals.
--- Make it so that there's some binds that I can always access from any mode, including terminal
--- mode. This would be triggered with something like Ctrl-Space. In this mode will contain:
 -- * Bind for doing the same but with opening a file. File can be opened with either telescope or
 --   neotree
 -- * Same thing but with manpages
@@ -614,7 +610,7 @@ end
 --   * Something like <C-Space><C-R> for replacing the window with a terminal...
 --   * ... but something like <C-Space>rf can replace the buffer with files.
 --   * Ideally, having the telescope/neotree window appear where the new buffer will be is ideal.
--- Binds for switching tabs really fast, and one for moving windows around would also be really cool. 
+-- Bind for moving windows between tabs? Idk if I'd find this useful.
 -- We should also like 100000% fix the issue where the neovim terminal freezes when it's doing too
 -- much...
 
