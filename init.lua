@@ -105,6 +105,15 @@ local function map(prefix)
     end
 end
 
+local function umap(keys, command, description)
+    for _, mode in ipairs {"n", "i", "t", "v", "s"} do
+        if description then
+            vim.keymap.set(mode, "<C-Space>" .. keys, command, "Universal: " .. description)
+        else
+            vim.keymap.set(mode, "<C-Space>" .. keys, command)
+        end
+    end
+end
 
 -- Configuring plugins
 require("lazy").setup {
@@ -409,8 +418,8 @@ require("lazy").setup {
              tmap("<leader>fh", telescope.help_tags, "[F]ind [H]elp")
 
              -- Will probably remove one of these... I must experiment
-             tmap("<leader>fc", telescope.commands, "[F]ind [C]ommands")
-             tmap("<leader>fC", telescope.command_history, "[F]ind [C]command history")
+             -- tmap("<leader>fc", telescope.commands, "[F]ind [C]ommands")
+             tmap("<leader>fc", telescope.command_history, "[F]ind [C]command history")
 
              -- TODO: might remove; do I really want to look at manpages through vim?
              tmap("<leader>fm", telescope.man_pages, "[F]ind [M]anpage")
@@ -620,12 +629,6 @@ local function spawn_tab(command)
     end
 end
 
-local function umap(keys, command)
-    for _, mode in ipairs {"n", "i", "t", "v", "s"} do
-        vim.keymap.set(mode, "<C-Space>" .. keys, command)
-    end
-end
-
 local function generate_launch(keys, command)
     umap("s" .. keys, spawn_horiz(command))
     umap("v" .. keys, spawn_vert(command))
@@ -633,17 +636,15 @@ local function generate_launch(keys, command)
     umap("t" .. keys, spawn_in_place(command))
 end
 
-umap("<C-s>", spawn_horiz(spawn_term))
-umap("<C-v>", spawn_vert(spawn_term))
-umap("<C-r>", spawn_in_place(spawn_term))
-umap("<C-t>", spawn_tab(spawn_term))
-generate_launch("t", spawn_term)
+umap("s", spawn_horiz(spawn_term))
+umap("v", spawn_vert(spawn_term))
+umap("r", spawn_in_place(spawn_term))
+umap("t", spawn_tab(spawn_term))
+-- generate_launch("t", spawn_term)
 
 umap(":", function()
     vim.cmd.stopinsert()
     vim.api.nvim_input(":")
-
-    -- TODO: add thing that will block until we're not in command mode, then nvim_input("i")
 end)
 
 -- I may instead this return and do nothing else if the requested tab doesn't exist, and then have a
