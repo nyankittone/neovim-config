@@ -95,24 +95,36 @@ local function lua_ls_init(client)
     })
 end
 
-local function map(prefix)
+local function map(mode, prefix)
     return function(keys, fn, description)
         if description then
             description = prefix .. ": " .. description
         end
 
-        vim.keymap.set("n", keys, fn, {desc = description})
+        vim.keymap.set(mode, keys, fn, {desc = description})
     end
 end
 
 local function umap(keys, command, description)
     for _, mode in ipairs {"n", "i", "t", "v", "s"} do
         if description then
-            vim.keymap.set(mode, "<C-Space>" .. keys, command, "Universal: " .. description)
+            vim.keymap.set(mode, "<C-Space>" .. keys, command, {desc = "Universal: " .. description})
         else
             vim.keymap.set(mode, "<C-Space>" .. keys, command)
         end
     end
+end
+
+local function umap_gen_all(strings)
+    local returned = {}
+
+    for _, str in ipairs(strings) do
+        for _, key_seq in ipairs {"n", "i", "t", "v", "s"} do
+            table.insert(returned, {key_seq, "<C-Space>" .. str})
+        end
+    end
+
+    return returned
 end
 
 -- Configuring plugins
@@ -295,24 +307,7 @@ require("lazy").setup {
              "debugloop/telescope-undo.nvim",
          },
 
-         -- Having Telescope be lazy-loaded like this is HELLA goofy and brittle. I should find a
-         -- better way...
-         keys = {
-             {"<leader>ff"},
-             {"<leader>fr"},
-             {"<leader><space>"},
-             {"<leader>fh"},
-             {"<leader>fc"},
-             {"<leader>fC"},
-             {"<leader>fm"},
-             {"<leader>fi"},
-             {"<leader>fd"},
-             {"<leader>gf"},
-             {"<leader>gc"},
-             {"<leader>gb"},
-             {"<leader>gs"},
-             {"<leader>u", "<cmd>Telescope undo<cr>"},
-         },
+         -- TODO: Lazy-load this sucker. Right now I have it turned off for convenience.
 
          config = function()
              pcall(require("telescope").load_extension, "fzf")
@@ -409,35 +404,32 @@ require("lazy").setup {
             require("telescope").load_extension("undo")
 
              local telescope = require "telescope.builtin"
-             local tmap = map("Telescope")
+             local tmap = map("n", "Telescope")
 
              -- Telescope-specific keybinds
-             tmap("<leader>ff", telescope.find_files, "[F]ind [F]iles")
-             tmap("<leader>fr", telescope.live_grep, "[F]ind with [R]egex")
-             tmap("<leader><space>", telescope.buffers, "Find Buffers")
-             tmap("<leader>fh", telescope.help_tags, "[F]ind [H]elp")
+             umap("f", telescope.find_files, "Find [F]iles")
+             umap("R", telescope.live_grep, "Find with [R]egex")
+             umap("<space>", telescope.buffers, "Find Buffers")
+             umap("h", telescope.help_tags, "Find [H]elp")
 
-             -- Will probably remove one of these... I must experiment
-             -- tmap("<leader>fc", telescope.commands, "[F]ind [C]ommands")
              tmap("<leader>fc", telescope.command_history, "[F]ind [C]command history")
+             tmap("<leader>u", require("telescope").extensions.undo.undo, "Open [U]ndo history")
 
-             -- TODO: might remove; do I really want to look at manpages through vim?
-             tmap("<leader>fm", telescope.man_pages, "[F]ind [M]anpage")
-             tmap("<leader>fi", telescope.current_buffer_fuzzy_find, "[F]ind [I]nside current buffer")
+             umap("m", telescope.man_pages, "[F]ind [M]anpage")
              tmap("<leader>fd", telescope.diagnostics, "[F]ind [D]iagnostics")
 
              -- Git-related keybinds
-             tmap("<leader>gf", telescope.git_files, "Show [G]it [F]iles")
-             tmap("<leader>gc", telescope.git_commits, "[G]it [C]ommits")
-             tmap("<leader>gb", telescope.git_branches, "[G]it [B]ranches")
-             tmap("<leader>gs", telescope.git_status, "[G]it [S]tatus")
+             umap("gf", telescope.git_files, "Show [G]it [F]iles")
+             umap("gc", telescope.git_commits, "[G]it [C]ommits")
+             umap("gb", telescope.git_branches, "[G]it [B]ranches")
+             umap("gs", telescope.git_status, "[G]it [S]tatus")
 
              -- TODO: Investigate switching some of the keybinds within the Telescope window.
              -- Namely, the binds for moving up and down from insert mode.
          end,
     },
 
-    -- TODO: COnfigure Neotree more in-depth. Also see if it meshes nicely with Oil.nvim, and if
+    -- TODO: Configure Neotree more in-depth. Also see if it meshes nicely with Oil.nvim, and if
     -- not, if I should remove this plugin.
     {
         "nvim-neo-tree/neo-tree.nvim",
@@ -627,13 +619,6 @@ local function spawn_tab(command)
         vim.cmd.tabnew()
         command_or_func(command)
     end
-end
-
-local function generate_launch(keys, command)
-    umap("s" .. keys, spawn_horiz(command))
-    umap("v" .. keys, spawn_vert(command))
-    umap("r" .. keys, spawn_in_place(command))
-    umap("t" .. keys, spawn_in_place(command))
 end
 
 umap("s", spawn_horiz(spawn_term))
