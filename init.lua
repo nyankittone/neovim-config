@@ -167,12 +167,14 @@ require("lazy").setup {
     {
         "uga-rosa/ccc.nvim",
         opts = {
-            auto_enable = true,
+            auto_enable = false,
             lsp = true,
             preserve = true,
             alpha = "auto",
             highlighter = {
                 auto_enable = true,
+                excludes = {""}, -- Preventing buffers that don't have a file type (e.g. terminals)
+                                 -- from being highlighted.
             },
         },
     },
