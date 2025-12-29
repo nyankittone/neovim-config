@@ -314,17 +314,97 @@ require("lazy").setup {
              table.insert(vimgrep_arguments, "--glob")
              table.insert(vimgrep_arguments, "!**/.git/*")
 
+             local actions = require("telescope.actions")
+             local state = require("telescope.actions.state")
+
+             local function vertical(callback)
+                 return function(_)
+                     local thing = state.get_selected_entry()
+                     vim.cmd.stopinsert()
+                     vim.cmd("quit!")
+
+                     vim.api.nvim_open_win(0, true, {
+                         split = "right",
+                         win = 0,
+                     })
+
+                     callback(thing)
+                 end
+             end
+
+             local function horizontal(callback)
+                 return function(_)
+                     local thing = state.get_selected_entry()
+                     vim.cmd.stopinsert()
+                     vim.cmd("quit!")
+
+                     vim.api.nvim_open_win(0, true, {
+                         split = "below",
+                         win = 0,
+                     })
+
+                     print(vim.inspect(thing))
+
+                     callback(thing)
+                 end
+             end
+
+             local function replace(callback)
+                 return function(_)
+                     local thing = state.get_selected_entry()
+                     vim.cmd.stopinsert()
+                     vim.cmd("quit!")
+
+                     print(vim.inspect(thing))
+
+                     callback(thing)
+                 end
+             end
+
              -- Continuing said setup for that, plus some extra shit
              require("telescope").setup {
                  defaults = {
                      vimgrep_arguments = vimgrep_arguments,
+
+                     mappings = {
+                         i = {
+                             ["<C-r>"] = actions.select_default,
+                             ["<C-s>"] = actions.select_horizontal,
+                             ["<C-v>"] = actions.select_vertical,
+                         },
+                     },
                  },
                  pickers = {
                      find_files = {
                          find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*"},
+
+                         mappings = {
+                             i = {
+                                 ["<C-s>"] = horizontal(function(selection)
+                                     vim.cmd.edit(selection[1])
+                                 end),
+                                 ["<C-v>"] = vertical(function(selection)
+                                     vim.cmd.edit(selection[1])
+                                 end),
+                             },
+                         },
                      },
                      man_pages = {
                          sections = { "ALL" },
+
+                         mappings = {
+                             i = {
+                                 ["<C-r>"] = replace(function(selection)
+                                     vim.cmd("hide Man " .. selection.section .. " " .. selection.ordinal)
+                                 end),
+                                 ["<C-v>"] = vertical(function(selection)
+                                     vim.cmd("hide Man " .. selection.section .. " " .. selection.ordinal)
+                                 end),
+                                 ["<C-s>"] = horizontal(function(selection)
+                                     vim.cmd("hide Man " .. selection.section .. " " .. selection.ordinal)
+                                 end),
+                             },
+                         },
                      },
                  },
                  extensions = {
