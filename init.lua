@@ -384,6 +384,11 @@ require("lazy").setup {
                              vim.cmd("hide Man " .. manpage.section .. " " .. manpage.ordinal)
                          end),
                      },
+                     buffers = {
+                         mappings = gen_binds(function(selected)
+                             vim.cmd.buffer(selected.bufnr)
+                         end),
+                     },
                  },
                  extensions = {
                      undo = {
@@ -401,7 +406,7 @@ require("lazy").setup {
                  },
              }
 
-            require("telescope").load_extension("undo")
+             require("telescope").load_extension("undo")
 
              local telescope = require "telescope.builtin"
              local tmap = map("n", "Telescope")
@@ -642,14 +647,6 @@ for i = 1,10 do
     end)
 end
 
--- * Bind for doing the same but with opening a file. File can be opened with either telescope or
---   neotree
--- * Same thing but with manpages
--- * actually maybe it'd be cool if I could use this for any binds where I want to make a new window
--- Binds like this should follow a consistent pattern for pressing.
---   * Something like <C-Space><C-R> for replacing the window with a terminal...
---   * ... but something like <C-Space>rf can replace the buffer with files.
---   * Ideally, having the telescope/neotree window appear where the new buffer will be is ideal.
 -- Bind for moving windows between tabs? Idk if I'd find this useful.
 -- We should also like 100000% fix the issue where the neovim terminal freezes when it's doing too
 -- much...
