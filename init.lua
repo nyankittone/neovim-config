@@ -317,48 +317,39 @@ require("lazy").setup {
              local actions = require("telescope.actions")
              local state = require("telescope.actions.state")
 
-             local function vertical(callback)
-                 return function(_)
-                     local thing = state.get_selected_entry()
-                     vim.cmd.stopinsert()
-                     vim.cmd("quit!")
+             local function gen_binds(strat)
+                 local function meow(callback, window_strat)
+                     return function(_)
+                         local thing = state.get_selected_entry()
+                         vim.cmd.stopinsert()
+                         vim.cmd("quit!")
 
-                     vim.api.nvim_open_win(0, true, {
-                         split = "right",
-                         win = 0,
-                     })
-
-                     callback(thing)
+                         window_strat()
+                         callback(thing)
+                     end
                  end
-             end
 
-             local function horizontal(callback)
-                 return function(_)
-                     local thing = state.get_selected_entry()
-                     vim.cmd.stopinsert()
-                     vim.cmd("quit!")
+                 local retpart = {
+                     ["<C-r>"] = meow(strat, function() end),
+                     ["<C-s>"] = meow(strat, function()
+                         vim.api.nvim_open_win(0, true, {
+                             split = "below",
+                             win = 0,
+                         })
+                     end),
+                     ["<C-v>"] = meow(strat, function()
+                         vim.api.nvim_open_win(0, true, {
+                             split = "right",
+                             win = 0,
+                         })
+                     end),
+                     ["<C-t>"] = meow(strat, vim.cmd.tabnew),
+                 }
 
-                     vim.api.nvim_open_win(0, true, {
-                         split = "below",
-                         win = 0,
-                     })
-
-                     print(vim.inspect(thing))
-
-                     callback(thing)
-                 end
-             end
-
-             local function replace(callback)
-                 return function(_)
-                     local thing = state.get_selected_entry()
-                     vim.cmd.stopinsert()
-                     vim.cmd("quit!")
-
-                     print(vim.inspect(thing))
-
-                     callback(thing)
-                 end
+                 return {
+                     n = retpart,
+                     i = retpart,
+                 }
              end
 
              -- Continuing said setup for that, plus some extra shit
@@ -378,33 +369,16 @@ require("lazy").setup {
                      find_files = {
                          find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*"},
 
-                         mappings = {
-                             i = {
-                                 ["<C-s>"] = horizontal(function(selection)
-                                     vim.cmd.edit(selection[1])
-                                 end),
-                                 ["<C-v>"] = vertical(function(selection)
-                                     vim.cmd.edit(selection[1])
-                                 end),
-                             },
-                         },
+                         mappings = gen_binds(function(selection)
+                             vim.cmd.edit(selection[1])
+                         end)
                      },
                      man_pages = {
                          sections = { "ALL" },
 
-                         mappings = {
-                             i = {
-                                 ["<C-r>"] = replace(function(selection)
-                                     vim.cmd("hide Man " .. selection.section .. " " .. selection.ordinal)
-                                 end),
-                                 ["<C-v>"] = vertical(function(selection)
-                                     vim.cmd("hide Man " .. selection.section .. " " .. selection.ordinal)
-                                 end),
-                                 ["<C-s>"] = horizontal(function(selection)
-                                     vim.cmd("hide Man " .. selection.section .. " " .. selection.ordinal)
-                                 end),
-                             },
-                         },
+                         mappings = gen_binds(function(manpage)
+                             vim.cmd("hide Man " .. manpage.section .. " " .. manpage.ordinal)
+                         end),
                      },
                  },
                  extensions = {
