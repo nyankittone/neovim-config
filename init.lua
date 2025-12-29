@@ -167,7 +167,7 @@ require("lazy").setup {
     {
         "uga-rosa/ccc.nvim",
         opts = {
-            auto_enable = false,
+            auto_enable = true,
             lsp = true,
             preserve = true,
             alpha = "auto",
