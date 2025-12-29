@@ -386,7 +386,7 @@ require("lazy").setup {
                      },
                      buffers = {
                          mappings = gen_binds(function(selected)
-                             vim.cmd.buffer(selected.bufnr)
+                             vim.api.nvim_set_current_buf(selected.bufnr)
                          end),
                      },
                  },
@@ -637,6 +637,8 @@ umap(":", function()
     vim.api.nvim_input(":")
 end)
 
+umap("n", vim.cmd.stopinsert, "Exit insert mode")
+
 -- I may instead this return and do nothing else if the requested tab doesn't exist, and then have a
 -- different key sequence for making new tabs.
 for i = 1,10 do
@@ -650,6 +652,7 @@ end
 -- Bind for moving windows between tabs? Idk if I'd find this useful.
 -- We should also like 100000% fix the issue where the neovim terminal freezes when it's doing too
 -- much...
+-- We should set up sessions to work better!
 
 -- Setting up autocommands
 vim.api.nvim_create_autocmd("TextYankPost", {
